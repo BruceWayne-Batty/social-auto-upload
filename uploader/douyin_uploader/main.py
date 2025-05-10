@@ -180,7 +180,7 @@ class DouYinVideo(object):
         await self.set_thumbnail(page, self.thumbnail_path)
 
         # 更换可见元素
-        await self.set_location(page, "杭州市")
+        await self.set_location(page, "深圳市")
 
         # 頭條/西瓜
         third_part_element = '[class^="info"] > [class^="first-part"] div div.semi-switch'
@@ -231,16 +231,20 @@ class DouYinVideo(object):
             #     await finish_confirm_element.click()
             # await page.locator("div[class^='footer'] button:has-text('完成')").click()
 
-    async def set_location(self, page: Page, location: str = "杭州市"):
-        # todo supoort location later
-        # await page.get_by_text('添加标签').locator("..").locator("..").locator("xpath=following-sibling::div").locator(
-        #     "div.semi-select-single").nth(0).click()
-        await page.locator('div.semi-select span:has-text("输入地理位置")').click()
-        await page.keyboard.press("Backspace")
-        await page.wait_for_timeout(2000)
-        await page.keyboard.type(location)
-        await page.wait_for_selector('div[role="listbox"] [role="option"]', timeout=5000)
-        await page.locator('div[role="listbox"] [role="option"]').first.click()
+    async def set_location(self, page: Page, location: str = "深圳市"):
+        try:
+            # todo supoort location later
+            # await page.get_by_text('添加标签').locator("..").locator("..").locator("xpath=following-sibling::div").locator(
+            #     "div.semi-select-single").nth(0).click()
+            await page.locator('div.semi-select span:has-text("输入地理位置")').click(timeout=30000)  # 增加超时时间到240秒
+            await page.keyboard.press("Backspace")
+            await page.wait_for_timeout(2000)
+            await page.keyboard.type(location)
+            await page.wait_for_selector('div[role="listbox"] [role="option"]', timeout=30000)  # 增加超时时间到240秒
+            await page.locator('div[role="listbox"] [role="option"]').first.click()
+        except Exception as e:
+            douyin_logger.warning(f"设置地理位置超时或失败，跳过此步骤: {str(e)}")
+            return
 
     async def main(self):
         async with async_playwright() as playwright:
